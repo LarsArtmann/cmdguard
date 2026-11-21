@@ -115,7 +115,7 @@ Before this session: 14 of 16 doc pages used `v4.` (120 occurrences), the visibl
 13. Generate the error-reference page on the site from `sentinelFacts()`.
 14. Generate the flag-tag table and the option tables from source.
 15. Add a docs test that every internal link target has a title and description.
-16. Add a test that every guide has a "Where to go next" section.
+16. ~~Add a test that every guide has a "Where to go next" section.~~ done — check-docs-api.py check #5 (wired via scripts/check-guide-sync.sh into CI + nix run .#check-all) fails any guide missing a '## Where to go next' section; all 20 guides comply, negative probe verified
 17. Verify the claim "62 sentinels" against `GenerateErrorReference()` in CI.
 18. Add a "docs build" check that fails on duplicate headings or empty pages.
 19. Audit every page for stale counts ("16 formats", "seven modules") against source constants.

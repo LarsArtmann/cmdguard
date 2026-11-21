@@ -280,7 +280,7 @@ the fixes, not the score, are the deliverable).
 20. `golangci-lint args:` guard — grep workflows for `args: run` (09-14 #18).
 
 **Website**
-21. Live-domain smoke-test script (W1).
+21. ~~Live-domain smoke-test script (W1).~~ done — scripts/check-website-smoke.py green vs the live domain: 30 routes 200, 404 path correct (post local firebase deploy, 2026-11-11)
 22. Fragment-level type-check harness (W2).
 23. `llms.txt` (W3).
 24. JSON-LD SoftwareApplication validation test (W4).
@@ -294,10 +294,10 @@ guides (b.3).
 
 **Fleet (repo:-tagged)**
 31. FM1: bump 25 consumers + `cv` to v5.0.1 (after item 2).
-32. FM2: CV `TestLoadIdentityPortalsSection`.
-33. FM3: CV `crm.checkpoint_path` defaultsYAML entry.
-34. FM4: pma health-probe `Routes.Version`/`WithVersion` panics.
-35. FM5: go-cqrs-lite hanging `cqrs-lint` `go/packages` tests in offline CI.
+32. ~~FM2: CV `TestLoadIdentityPortalsSection`.~~ done — STALE 2026-11-11: TestLoadIdentityPortalsSection PASSES at CV HEAD; the only CV red is its own TestKeywordLogoCoverage (8 keywords without icons, a CV design decision)
+33. ~~FM3: CV `crm.checkpoint_path` defaultsYAML entry.~~ done — FIXED 2026-11-11: crm.checkpoint_path added to defaultsCRMYAML (empty = in-memory-only); TestDefaultsYAMLContainsEveryConfigKey green in cv
+34. ~~FM4: pma health-probe `Routes.Version`/`WithVersion` panics.~~ done — FIXED + PUSHED 2026-11-11: pma NewServer clears routes.Version when cfg.Version is empty; go-health panics on empty stamp avoided; full suite green 10x
+35. ~~FM5: go-cqrs-lite hanging `cqrs-lint` `go/packages` tests in offline CI.~~ done — FIXED + PUSHED 2026-11-11 (go-cqrs-lite 57982df48): not a hang — 2 tests x 58s go/packages vs the 120s per-binary timeout; shared sync.Once BuildContext cuts the pair to ~24s
 36. FM6: `describe`-contract snapshot test per consumer. **→ TODO_LIST FM6 (canonical row lives there)**
 37. FM7: commit `cv`'s migration (verify the 20 files first — not my work). **→ SUPERSEDED — see TODO_LIST FM7 verdict (cv origin/master carries the migration; fork preserved on local-fork-backup-20261111)**
 38. FM8: fleet-wide `golangci-lint` + `go vet` + `go test -race` sweep.

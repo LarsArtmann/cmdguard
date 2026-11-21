@@ -52,12 +52,12 @@
 
 ## f) Up to 50 things we should get done next
 
-1. Push the permissions fix + micro-task commits; watch run: test job green, badge commit lands on master (T1.4-T1.5).
-2. Fetch the raw badge URL and confirm it renders 86.2% (T1.6) — the fleet-audit F5 deliverable, fully live.
-3. Strike SU24 + SU38 rows with the run ID evidence.
-4. Strike SU41 (siblings up-to-date, verified).
-5. Run the fresh full `nix run .#check-all` (T2/SU39) on the final tree; strike the row.
-6. `docs-gates purge --apply` for the 15+ struck rows (T4/SU43); battery green.
+1. ~~Push the permissions fix + micro-task commits; watch run: test job green, badge commit lands on master (T1.4-T1.5).~~ done — pushed through e5dbb9b; CI run 44853943250 7/7 green; badge bot commit c902c78 landed on master (job-scoped contents:write fixed the 403)
+2. ~~Fetch the raw badge URL and confirm it renders 86.2% (T1.6) — the fleet-audit F5 deliverable, fully live.~~ done — raw badge URL resolves and renders coverage 86.3% (green tier)
+3. ~~Strike SU24 + SU38 rows with the run ID evidence.~~ done — SU24 + SU38 struck via safe-strike batch with run-ID evidence
+4. ~~Strike SU41 (siblings up-to-date, verified).~~ done — SU41 struck; adf2e80 + 7d14347 + bc369053 verified on origin
+5. ~~Run the fresh full `nix run .#check-all` (T2/SU39) on the final tree; strike the row.~~ done — full check-all green 2026-11-21 (EXIT=0) after treeWalkingRule construction fix (lint/rules.go, exhaustruct_v5 toolchain drift) and AGENTS dep-budget 14→15 (go-branded-id direct for BD003)
+6. ~~`docs-gates purge --apply` for the 15+ struck rows (T4/SU43); battery green.~~ done — docs-gates purge --apply purged 47 struck rows into the CHANGELOG entry; battery green after annotating the dissolved-harvest items at their sources (16 + 21 + 23 + 32-35)
 7. cue-policy: exempt reusable-call jobs from required runs-on/steps in ci_workflow.cue + release_workflow.cue; re-vet cmdguard's workflows; end the --no-verify era (T27).
 8. templ-components: baseline or fix the 55 findings; make it committable without --no-verify (T5/SU40).
 9. annotate.go per-row TSV validation with row-numbered errors (T6/SU42, repo: docs-gates).
