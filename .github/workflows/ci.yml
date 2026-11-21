@@ -83,7 +83,7 @@ jobs:
           # heredoc above interpolates ${total}; a failed awk would emit a
           # broken SVG silently).
           grep -q '<svg' .github/badges/coverage.svg
-          grep -qE '>[0-9]+(\\.[0-9]+)?%</text>' .github/badges/coverage.svg
+          grep -qE '>[0-9]+(\.[0-9]+)?%</text>' .github/badges/coverage.svg
 
       - name: Commit coverage badge
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
