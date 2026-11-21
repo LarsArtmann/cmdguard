@@ -292,22 +292,18 @@ func (r *treeWalkingRule) Coverage(_ context.Context, _ string) (int, []string) 
 // initialization cycles. The Run closure records the walked file count on the
 // rule so Coverage can report it after Check.
 func ruleFor(meta linter.RuleMeta, check func(*project, linter.RuleMeta) []finding.Finding) *treeWalkingRule {
-	var rule *treeWalkingRule
-	rule = &treeWalkingRule{
-		RuleFunc: linter.RuleFunc{
-			Meta: meta,
-			Run: func(ctx context.Context, dir string) ([]finding.Finding, error) {
-				proj, err := analyze(ctx, dir)
-				if err != nil {
-					return nil, fmt.Errorf("cmdguard-lint: analyzing %s: %w", dir, err)
-				}
+	rule := new(treeWalkingRule)
 
-				rule.scanned = len(proj.files)
+	rule.Meta = meta
+	rule.Run = func(ctx context.Context, dir string) ([]finding.Finding, error) {
+		proj, err := analyze(ctx, dir)
+		if err != nil {
+			return nil, fmt.Errorf("cmdguard-lint: analyzing %s: %w", dir, err)
+		}
 
-				return applySuppressions(proj, check(proj, meta)), nil
-			},
-		},
-		scanned: 0,
+		rule.scanned = len(proj.files)
+
+		return applySuppressions(proj, check(proj, meta)), nil
 	}
 
 	return rule
