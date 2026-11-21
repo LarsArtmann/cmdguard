@@ -7,6 +7,9 @@ Checks, in order:
   2. Every ``v5.X`` / ``cli.X`` / sub-module ``X.Y`` symbol mentioned in the docs
      exists in the source tree.
   3. Every full Go program embedded in the docs compiles against the local v5 API.
+  4. Every guide carries a "Where to go next" section.
+  5. Every ``$ taskctl describe`` excerpt matches the real binary's bytes
+     (elided at the guide's own ``/* ... */`` cut marks, verbatim elsewhere).
 
 Exit code 0 means the docs match the code. Run from anywhere; paths resolve
 relative to this file.
@@ -263,6 +266,96 @@ def check_guide_next_sections() -> None:
             fail(f"{rel(path)}: guide is missing a '## Where to go next' section")
 
 
+def describe_excerpt_blocks() -> list[tuple[str, int, list[str]]]:
+    """Extract every ```bash block that claims to show `taskctl describe` bytes.
+
+    Returns (path, fence line, excerpt lines) triples, excerpt lines being the
+    block content minus the `$ taskctl describe` prompt line.
+    """
+    blocks: list[tuple[str, int, list[str]]] = []
+    for path in glob.glob(os.path.join(DOCS, "**", "*.mdx"), recursive=True):
+        text = open(path, encoding="utf-8").read()
+        for match in re.finditer(r"```bash\n\$ taskctl describe\n(.*?)```", text, re.DOTALL):
+            line = text.count("\n", 0, match.start()) + 1
+            blocks.append((path, line, match.group(1).splitlines()))
+    return blocks
+
+
+def excerpt_segments(lines: list[str]) -> list[list[str]]:
+    """Split an excerpt into contiguous non-elided segments.
+
+    `/* ... */` comments mark where real bytes were cut; everything between
+    them must match the real output verbatim, in order.
+    """
+    segments: list[list[str]] = []
+    current: list[str] = []
+    in_comment = False
+    for line in lines:
+        stripped = line.strip()
+        if in_comment:
+            if "*/" in stripped:
+                in_comment = False
+            continue
+        if stripped.startswith("/*"):
+            if "*/" not in stripped:
+                in_comment = True
+            if current:
+                segments.append(current)
+                current = []
+            continue
+        current.append(line.rstrip())
+    if current:
+        segments.append(current)
+    return segments
+
+
+def check_describe_excerpt() -> None:
+    blocks = describe_excerpt_blocks()
+    if not blocks:
+        fail("no `$ taskctl describe` excerpt found in the docs to pin")
+        return
+
+    go_bin = shutil.which("go")
+    if go_bin is None:
+        print("SKIP: go not on PATH, cannot run taskctl describe")
+        return
+
+    env = os.environ | {"GOWORK": "off", "GOEXPERIMENT": "jsonv2"}
+    run = subprocess.run(
+        [go_bin, "run", "./examples/taskctl", "describe"],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    if run.returncode != 0:
+        fail(f"taskctl describe failed to run:\n{run.stderr.strip()[:2000]}")
+        return
+
+    real = [line.rstrip() for line in run.stdout.splitlines()]
+    search_from = 0
+    for path, fence, lines in blocks:
+        for segment in excerpt_segments(lines):
+            joined = "\n".join(segment)
+            window = "\n".join(real[search_from : search_from + len(segment)])
+            if window == joined:
+                search_from += len(segment)
+                continue
+            hit = -1
+            for start in range(search_from, len(real) - len(segment) + 1):
+                if "\n".join(real[start : start + len(segment)]) == joined:
+                    hit = start
+                    break
+            if hit < 0:
+                fail(
+                    f"{rel(path)}:{fence} excerpt segment diverges from real "
+                    f"taskctl describe output (first line: {segment[0]!r})"
+                )
+                return
+            search_from = hit + len(segment)
+
+
 def main() -> int:
     check_stale_major()
     check_hero_single_source()
@@ -270,6 +363,7 @@ def main() -> int:
     check_symbols()
     compile_samples()
     check_guide_next_sections()
+    check_describe_excerpt()
 
     if failures:
         print()

@@ -11,6 +11,9 @@
 #   2. every v5.X / cli.X / sub-module symbol in the docs exists in source
 #   3. every complete Go program embedded in the docs compiles
 #   4. the hero snippet has a single source of truth
+#   5. every guide carries a "Where to go next" section
+#   6. `$ taskctl describe` excerpts in the docs match the real binary's bytes
+#      (elided only at the guide's own `/* ... */` cut marks)
 #
 # Run it directly or through `nix run .#check-all`.
 set -euo pipefail
