@@ -6,7 +6,7 @@
 
 **Project:** cmdguard - CLI Guard Library
 **Go Version:** 1.27 (GOEXPERIMENT=jsonv2)
-**Status:** v5.0.0 (master) - v4 retired at v4.3.1 on the frozen `release/v4` branch; zero panics, 89.3% core coverage (as-of 2026-11-20; live number is the CI-generated `.github/badges/coverage.svg` badge), 0 lint issues, 0 race conditions
+**Status:** v5.0.0 (master) - v4 retired at v4.3.1 on the frozen `release/v4` branch; zero panics, 89.3% core coverage (as-of 2026-11-20; the CI-generated `.github/badges/coverage.svg` badge deliberately reports the FLEET-TOTAL across all 8 workspace modules instead — owner decision 2026-11-21), 0 lint issues, 0 race conditions
 
 ---
 
@@ -250,7 +250,7 @@ The docs-health battery gates this repo's living docs and `docs/status/` corpus.
 The `docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.html` audit (10 findings, all resolved) left standing rules:
 
 - **D15 — headline tiering.** README leads with WHY-SWITCH ("catches missing handlers, duplicate commands, and invalid flags at construction — not at 2am in production"); the website hero leads with WHAT-IT-IS ("From flags to shutdown, type-safe."). Each surface links the other (README header → cmdguard.lars.software; website hero → this repo). Do NOT converge the two lines — the tiering is deliberate.
-- **One fact, one home.** Canonical surfaces: tag vocabulary → README "Flag Tags Reference" (13-tag superset); validate rules → README "Validate rules" table + website type-safe-flags guide (same 10-rule registry, `flags_validate.go:57-67` is the source); sentinel counts → `docs/ERROR_REFERENCE.md` only (generated — derive counts with `rg`, never hand-count); coverage number → the CI-generated badge `.github/badges/coverage.svg` (committed by ci.yml on every master push, never hand-edited; Codecov is not activated for this repo and its badge stays "unknown"); feature availability → "(since vX.Y.Z)" annotations at each mention (CHANGELOG is the version source). SKILL.md, website guides, and AGENTS.md point at these homes instead of restating.
+- **One fact, one home.** Canonical surfaces: tag vocabulary → README "Flag Tags Reference" (13-tag superset); validate rules → README "Validate rules" table + website type-safe-flags guide (same 10-rule registry, `flags_validate.go:57-67` is the source); sentinel counts → `docs/ERROR_REFERENCE.md` only (generated — derive counts with `rg`, never hand-count); coverage number → the CI-generated badge `.github/badges/coverage.svg` (committed by ci.yml on every master push, never hand-edited; it reports FLEET-TOTAL coverage by owner decision 2026-11-21, so core-only headline numbers in README/AGENTS are deliberate tiering, not badge drift; Codecov is not activated for this repo and its badge stays "unknown"); feature availability → "(since vX.Y.Z)" annotations at each mention (CHANGELOG is the version source). SKILL.md, website guides, and AGENTS.md point at these homes instead of restating.
 
 ### Lint Strategy
 
