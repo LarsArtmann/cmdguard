@@ -136,21 +136,21 @@ func TestReference(t *testing.T) {
 			wantDead:  []string{"ErrTestOnly"},
 		},
 		{
-			name: "reference from another package does not wire",
+			name: "unexported sentinel referenced from another package stays dead",
 			files: map[string]string{
 				"sentinel.go": fixturePreamble + `
-var ErrLonely = newErr("lonely")
+var errLonely = newErr("lonely")
 `,
 				"other/other.go": `package other
 
 import probe "probe"
 
-func useLonely() error { return probe.ErrLonely }
+func useLonely() error { return probe.errLonely }
 `,
 			},
 			allowFile: "",
 			wantDecls: 1,
-			wantDead:  []string{"ErrLonely"},
+			wantDead:  []string{"errLonely"},
 		},
 	}
 
@@ -221,6 +221,23 @@ func consumeB() error { return ErrGroupB }
 			},
 			allowFile: "",
 			wantDecls: 2,
+			wantDead:  nil,
+		},
+		{
+			name: "exported sentinel wired only from another package",
+			files: map[string]string{
+				"sentinel.go": fixturePreamble + `
+var ErrRemote = newErr("remote")
+`,
+				"other/other.go": `package other
+
+import probe "probe"
+
+func useRemote() error { return probe.ErrRemote }
+`,
+			},
+			allowFile: "",
+			wantDecls: 1,
 			wantDead:  nil,
 		},
 		{

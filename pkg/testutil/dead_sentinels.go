@@ -41,9 +41,13 @@ type sentinelDecl struct {
 // err* variables that are initialized by a call — or carry an explicit
 // error type — but are never referenced outside their declaration and
 // allowFile (a base file name whose whole purpose is sentinel bookkeeping,
-// e.g. the core error-facts table; pass "" for none). Reference checks run
-// per package directory: a sentinel referenced only from another package is
-// still dead. Test files never wire a sentinel.
+// e.g. the core error-facts table; pass "" for none). Reference checks are
+// package-scoped: unexported sentinels referenced only from another package
+// are dead, and a sentinel referenced only from a test file never counts as
+// wired. Exported Err* sentinels are additionally kept alive by any
+// qualified identifier (pkg.ErrX) anywhere in the tree — another package in
+// the module or an external consumer may be the only wire — so deleting
+// one still requires an rg-level check of real consumers.
 //
 // The scan mirrors the 2026-11-22 dead-sentinel audit that removed five
 // editor/nil sentinels the v5 scaffold had mechanically re-added: a
@@ -51,6 +55,7 @@ type sentinelDecl struct {
 func FindDeadSentinels(dir, allowFile string) (SentinelScan, error) {
 	scan := SentinelScan{}
 	declsByDir := map[string]map[string]sentinelDecl{}
+	exportedRefs := map[string]bool{}
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
@@ -76,6 +81,7 @@ func FindDeadSentinels(dir, allowFile string) (SentinelScan, error) {
 			declsByDir[dirPath] = map[string]sentinelDecl{}
 		}
 		collectSentinelDecls(af, path, declsByDir[dirPath])
+		collectExportedSelectorNames(af, exportedRefs)
 		return nil
 	})
 	if err != nil {
@@ -89,13 +95,17 @@ func FindDeadSentinels(dir, allowFile string) (SentinelScan, error) {
 			return SentinelScan{}, err
 		}
 		for name, decl := range decls {
-			if !alive[name] {
-				scan.Findings = append(scan.Findings, SentinelFinding{
-					Name: name,
-					File: decl.file,
-					Dir:  dirPath,
-				})
+			if alive[name] {
+				continue
 			}
+			if isExportedSentinelName(name) && exportedRefs[name] {
+				continue
+			}
+			scan.Findings = append(scan.Findings, SentinelFinding{
+				Name: name,
+				File: decl.file,
+				Dir:  dirPath,
+			})
 		}
 	}
 
@@ -171,6 +181,22 @@ func wiredSentinels(dirPath string, decls map[string]sentinelDecl, allowFile str
 	return alive, nil
 }
 
+// collectExportedSelectorNames records every exported ErrX identifier used
+// in selector position (pkg.ErrX) anywhere in af — cross-package wiring for
+// exported sentinels.
+func collectExportedSelectorNames(af *ast.File, refs map[string]bool) {
+	ast.Inspect(af, func(n ast.Node) bool {
+		sel, ok := n.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		if isExportedSentinelName(sel.Sel.Name) {
+			refs[sel.Sel.Name] = true
+		}
+		return true
+	})
+}
+
 // selfDeclPositions maps the sentinel names DECLARED in af (restricted to
 // the tracked set owned by file) to their declaration positions, so the
 // reference scan can exclude the declaration itself while still counting a
@@ -200,14 +226,23 @@ func selfDeclPositions(af *ast.File, decls map[string]sentinelDecl, file string)
 // isSentinelVarName reports whether name follows the sentinel conventions:
 // an exported Err + exported-word name, or any unexported err name.
 func isSentinelVarName(name string) bool {
-	if strings.HasPrefix(name, "Err") {
-		rest := name[len("Err"):]
-		return rest != "" && unicode.IsUpper(rune(rest[0]))
+	return isExportedSentinelName(name) || isUnexportedSentinelName(name)
+}
+
+// isExportedSentinelName reports whether name is an exported sentinel:
+// Err followed by another exported word.
+func isExportedSentinelName(name string) bool {
+	if !strings.HasPrefix(name, "Err") {
+		return false
 	}
-	if strings.HasPrefix(name, "err") {
-		return len(name) > len("err")
-	}
-	return false
+	rest := name[len("Err"):]
+	return rest != "" && unicode.IsUpper(rune(rest[0]))
+}
+
+// isUnexportedSentinelName reports whether name is an unexported sentinel:
+// err followed by anything.
+func isUnexportedSentinelName(name string) bool {
+	return strings.HasPrefix(name, "err") && len(name) > len("err")
 }
 
 // isSentinelInitializer reports whether the value spec is shaped like the
