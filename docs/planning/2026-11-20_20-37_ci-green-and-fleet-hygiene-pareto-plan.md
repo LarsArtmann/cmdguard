@@ -211,19 +211,19 @@ flowchart TD
 
 ## 6. Added during execution (2026-11-20 ~22:00)
 
-| ID | Task | ≤min | Why |
-| --- | --- | --- | --- |
-| T27 | cue-policy: exempt reusable-call jobs (`uses:` at job level) from the required runs-on/steps schema in ci_workflow.cue + release_workflow.cue, then re-vet cmdguard's workflows (repo: cue-policy) | 60 | The policy wrongly blocks every commit that stages a workflow with a `uses:` job (GitHub Actions forbids runs-on/steps on call jobs); found 2026-11-20 when the pre-commit findings gate blocked the sanity-grep fix |
+| ID  | Task                                                                                                                                                                                               | ≤min | Why                                                                                                                                                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T27 | cue-policy: exempt reusable-call jobs (`uses:` at job level) from the required runs-on/steps schema in ci_workflow.cue + release_workflow.cue, then re-vet cmdguard's workflows (repo: cue-policy) | 60   | The policy wrongly blocks every commit that stages a workflow with a `uses:` job (GitHub Actions forbids runs-on/steps on call jobs); found 2026-11-20 when the pre-commit findings gate blocked the sanity-grep fix |
 
 ## 7. Execution log
 
-| When | Micro tasks | Outcome |
-| --- | --- | --- |
-| 2026-11-20 20:37-20:45 | T1.1 review, commit prep | 19:18 run proved dogfood + branded-ID + Website green; isolated badge-grep escaping bug (doubled backslash), fixed and byte-verified; real total 86.2% |
-| 2026-11-21 00:43 | T1.2 push master (3558c78) | CI run 44845752228 queued |
-| 2026-11-21 00:44 | T3.1-T3.4 (SU41) | SKILLS + templ-components already up-to-date (their daemons pushed); fan-out resolves; row strikeable |
-| 2026-11-21 00:46 | T19 (verify umbrella line) | README verify block gains the `nix run .#check-all` line (pre-flighted SAFE) |
-| 2026-11-21 00:47 | T17 (.gitattributes) | `.github/badges/*.svg linguist-generated` |
-| 2026-11-21 00:49 | T18 (domain terms) | CoverageStamp + ValidateRule rows in DOMAIN_LANGUAGE.md (pre-flighted SAFE) |
-| 2026-11-21 00:51 | T24 | Vacuous: examples/config-explain has no README to sweep; candidate resolved-as-moot |
-| pending | T1.3-T1.6 | CI queued on runner availability; watch running |
+| When                   | Micro tasks                | Outcome                                                                                                                                                |
+| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-11-20 20:37-20:45 | T1.1 review, commit prep   | 19:18 run proved dogfood + branded-ID + Website green; isolated badge-grep escaping bug (doubled backslash), fixed and byte-verified; real total 86.2% |
+| 2026-11-21 00:43       | T1.2 push master (3558c78) | CI run 44845752228 queued                                                                                                                              |
+| 2026-11-21 00:44       | T3.1-T3.4 (SU41)           | SKILLS + templ-components already up-to-date (their daemons pushed); fan-out resolves; row strikeable                                                  |
+| 2026-11-21 00:46       | T19 (verify umbrella line) | README verify block gains the `nix run .#check-all` line (pre-flighted SAFE)                                                                           |
+| 2026-11-21 00:47       | T17 (.gitattributes)       | `.github/badges/*.svg linguist-generated`                                                                                                              |
+| 2026-11-21 00:49       | T18 (domain terms)         | CoverageStamp + ValidateRule rows in DOMAIN_LANGUAGE.md (pre-flighted SAFE)                                                                            |
+| 2026-11-21 00:51       | T24                        | Vacuous: examples/config-explain has no README to sweep; candidate resolved-as-moot                                                                    |
+| pending                | T1.3-T1.6                  | CI queued on runner availability; watch running                                                                                                        |

@@ -93,4 +93,4 @@
 
 ---
 
-*Verified at report time: docs-gates 5/5 PASS; check-guide-sync 6 legs OK; check-rows complete; fan-out 54 links OK; CI re-running on 3f9bdc9 with the format fix (previous red fully root-caused: parallel-session import, one file, three jobs).*
+_Verified at report time: docs-gates 5/5 PASS; check-guide-sync 6 legs OK; check-rows complete; fan-out 54 links OK; CI re-running on 3f9bdc9 with the format fix (previous red fully root-caused: parallel-session import, one file, three jobs)._

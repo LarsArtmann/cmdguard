@@ -174,53 +174,53 @@ FM8's stale path repaired.
 10. SU10 merge Dependabot #21.
 11. Set `FIREBASE_SERVICE_ACCOUNT` (owner) → CI deploy stops skipping.
 12. cv bump once the concurrent session greens `internal/ui`.
-~~13. journal/pim-sync push decision (§g3).~~ **Won't implement — owner decision on external repos (journal/pim-sync); not actionable in cmdguard; question aged.**
-14. A29 fragment compile mode in check-docs-api.py.
-15. A30 JSON-LD validation test.
-16. A31 MDX linter on website/src.
-17. A43 CV render-goldens determinism. **→ tracked in TODO_LIST SU11**
-18. A44 nsfw `oops.Join` single-cause fix. **→ tracked in TODO_LIST SU12**
-19. A45 go-cqrs-lite doc-check path fix + tidy-drift CI check.
-20. A46 crm `createDeal` helper + contact-notes re-verify. **→ tracked in TODO_LIST SU13**
-21. A47 consumer CHANGELOG/AGENTS batch (26 repos).
-22. A48 CG002 gate piloted in one consumer CI.
-23. A35–A37: the 02-29 deep-annotate as the next archive batch (prose done;
+    ~~13. journal/pim-sync push decision (§g3).~~ **Won't implement — owner decision on external repos (journal/pim-sync); not actionable in cmdguard; question aged.**
+13. A29 fragment compile mode in check-docs-api.py.
+14. A30 JSON-LD validation test.
+15. A31 MDX linter on website/src.
+16. A43 CV render-goldens determinism. **→ tracked in TODO_LIST SU11**
+17. A44 nsfw `oops.Join` single-cause fix. **→ tracked in TODO_LIST SU12**
+18. A45 go-cqrs-lite doc-check path fix + tidy-drift CI check.
+19. A46 crm `createDeal` helper + contact-notes re-verify. **→ tracked in TODO_LIST SU13**
+20. A47 consumer CHANGELOG/AGENTS batch (26 repos).
+21. A48 CG002 gate piloted in one consumer CI.
+22. A35–A37: the 02-29 deep-annotate as the next archive batch (prose done;
     ~65 table verdicts remain), then the 04-15 report (28 items).
-24. Wire fleet-sweep as a scheduled CI job (A33 completion).
-25. GO-2026-6859: flake bump when nixpkgs ships go1.27.4, then re-run
+23. Wire fleet-sweep as a scheduled CI job (A33 completion).
+24. GO-2026-6859: flake bump when nixpkgs ships go1.27.4, then re-run
     govulncheck to zero.
-26. templ pin retirement tracking (templ-components ≥ v0.3.1100
+25. templ pin retirement tracking (templ-components ≥ v0.3.1100
     regeneration), then remove the four pins + re-vendor.
-27. Retitle erraudit#15 / timesheets#3 to v5.1.0 and merge on green.
-28. pma: add a positive-path test for `/version` WITH a stamp.
-29. go-cqrs-lite: flag the foreign dirty files (snapshot_test.go +
+26. Retitle erraudit#15 / timesheets#3 to v5.1.0 and merge on green.
+27. pma: add a positive-path test for `/version` WITH a stamp.
+28. go-cqrs-lite: flag the foreign dirty files (snapshot_test.go +
     snapshot_shape_test.go) to the owner — not mine.
-30. A52: draft DEPRECATION_POLICY.md (needs D8 answer).
-31. ROADMAP Q2/Q3 execution when D4/D6 land (branches, worktrees).
-32. ROADMAP Q7 execution when D5 lands (cv/CV canonical).
-33. ROADMAP Q6 execution when D10 lands (release/v4 pin hygiene).
-34. ROADMAP Q4 remainder: decide v5-as-single-documented-line.
-35. A39 follow-up: required-checks ruleset with the reusable-workflow
+29. A52: draft DEPRECATION_POLICY.md (needs D8 answer).
+30. ROADMAP Q2/Q3 execution when D4/D6 land (branches, worktrees).
+31. ROADMAP Q7 execution when D5 lands (cv/CV canonical).
+32. ROADMAP Q6 execution when D10 lands (release/v4 pin hygiene).
+33. ROADMAP Q4 remainder: decide v5-as-single-documented-line.
+34. A39 follow-up: required-checks ruleset with the reusable-workflow
     check names.
-36. Banner → v4.3.1 release-page link (currently points at the guide).
-37. Smoke script: add the banner assertion; wire it into the website
+35. Banner → v4.3.1 release-page link (currently points at the guide).
+36. Smoke script: add the banner assertion; wire it into the website
     workflow post-deploy.
-38. Fleet sweep: add per-repo `go test -race` to the artifact.
-39. Parameterize `fleet-bump-v5.1.0.sh` → `fleet-bump.sh <version>`. **→ tracked in TODO_LIST SU14**
-40. Generate the sweep findings table inside `fleet-sweep.sh`.
-41. `buildflow doctor` re-run (binary freshness warning recurred all day).
-42. `.agents/skills/cmdguard/SKILL.md`: document the suppression directive's
+37. Fleet sweep: add per-repo `go test -race` to the artifact.
+38. Parameterize `fleet-bump-v5.1.0.sh` → `fleet-bump.sh <version>`. **→ tracked in TODO_LIST SU14**
+39. Generate the sweep findings table inside `fleet-sweep.sh`.
+40. `buildflow doctor` re-run (binary freshness warning recurred all day).
+41. `.agents/skills/cmdguard/SKILL.md`: document the suppression directive's
     no-space prefix (the one detail that silently no-ops).
-43. cmdguard-lint: `--explain <ID>` surface for directive syntax errors.
-44. Normalize golden filenames/permissions for consumer adoption (0600 →
+42. cmdguard-lint: `--explain <ID>` surface for directive syntax errors.
+43. Normalize golden filenames/permissions for consumer adoption (0600 →
     0644 for shared fixtures).
-45. A24 residual: api-reference.mdx option-order parity with the guide.
-46. Fleet-wide `cmdguard/v4` string audit for CG002 stragglers.
-47. SBOM/license artifact attached to the v5.1.0 release.
-48. check-all caching (the 8-module loop re-tests unchanged modules).
-49. A52 second half: generate_release_notes vs CHANGELOG-driven decision
+44. A24 residual: api-reference.mdx option-order parity with the guide.
+45. Fleet-wide `cmdguard/v4` string audit for CG002 stragglers.
+46. SBOM/license artifact attached to the v5.1.0 release.
+47. check-all caching (the 8-module loop re-tests unchanged modules).
+48. A52 second half: generate_release_notes vs CHANGELOG-driven decision
     recorded (v5.1.0 shipped with generate_release_notes).
-50. Keep the pre-tag gate's precedent: every future release mechanizes one
+49. Keep the pre-tag gate's precedent: every future release mechanizes one
     more manual step (the v4.3.0 lesson now has three mechanisms).
 
 ## g) Three questions I cannot figure out myself

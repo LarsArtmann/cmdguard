@@ -135,7 +135,7 @@
 ~~33. Dependabot entries for the new module (buildflow -s dependabot-auto-configure).~~ done — .github/dependabot.yml carries directory: /lint
 ~~34. website/ docs page + root README table row.~~ done — root README.md lint row (CG001-CG008) + website/src/content/docs/guides/lint.mdx exist
 ~~35. Dogfood gate: run cmdguard-lint on cmdguard in BuildFlow (self-consumer).~~ done — provider compiled into BuildFlow via sdk_imports.go blank import; fleet-wide since lint/v0.3.0 (AGENTS.md)
-~~36. examples/ before-after fixtures in lint/README.~~ **Won't implement — never pursued; README carries rule table + usage; before/after fixtures live in *_test.go.**
+~~36. examples/ before-after fixtures in lint/README.~~ *_Won't implement — never pursued; README carries rule table + usage; before/after fixtures live in **test.go.**
 ~~37. Restore/replace the dead pre-commit hook (core.hooksPath → missing .githooks).~~ done — tracked .githooks/pre-commit exists; AGENTS.md documents the global core.hooksPath=.githooks convention
 ~~38. Fix pre-existing taskctl exhaustruct findings (repo's "0 lint issues" claim is stale for examples/).~~ done — .golangci.yml path-excludes examples/ under exhaustruct_v5
 ~~39. LSP integration via go-finding's lsp.go.~~ **Won't implement — never pursued through v0.3.0; no LSP surface in lint/.**

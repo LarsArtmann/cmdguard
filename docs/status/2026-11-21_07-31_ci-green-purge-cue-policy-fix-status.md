@@ -107,4 +107,4 @@
 
 ---
 
-*Verified at report time: docs-gates 5/5 PASS; CI 7/7 on 6d206c9; badge live at 86.2%; cue-policy c1482c8 pushed; TODO_LIST has SU45 (shape-damaged, content done), SU46/SU47 open; everything else in section a carries its own evidence line.*
+_Verified at report time: docs-gates 5/5 PASS; CI 7/7 on 6d206c9; badge live at 86.2%; cue-policy c1482c8 pushed; TODO_LIST has SU45 (shape-damaged, content done), SU46/SU47 open; everything else in section a carries its own evidence line._

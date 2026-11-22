@@ -67,33 +67,33 @@ Impact: Critical/High/Medium/Low · Effort: S (<30min)/M (30min–2h)/L (>2h)
 
 <!-- check-rows:ledger -->
 
-| #  | Task                                                                                                                                                        | Impact | Effort | Category |
-| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1  | Bump the BuildFlow lint provider pin to `linter/v0.4.0` (fleet still lints with v0.3.0; blank import + toolsdk pin in BuildFlow's sdk_imports)              | High   | S      | Release  |
-| 2  | Cut a cmdguard v5.x release carrying the pristine-help contract fix (consumers on v5.1.0 still get ANSI in describe)                                        | High   | S      | Release  |
-| 3  | Add `attribute.ref` mapping + ref condition to the WIF provider so only refs/heads/master (and optionally tags) can impersonate the deploy SA               | Medium | S      | Security |
-| 4  | Decide `WIF_PROVIDER` secret → repo variable (the provider path is not sensitive; a variable is visible in workflow logs and less rotation-sensitive)       | Low    | S      | Decision |
-| 5  | Fleet sweep: which other repos still authenticate CI with long-lived cloud keys — apply the WIF playbook where found                                        | High   | M      | Security |
-| 6  | Verify pkg.go.dev docs for lint/v0.4.0 generated (the /fetch trigger 404'd; re-fetch until 200)                                                             | Low    | S      | Release  |
-| 7  | Add pkg.go.dev verification (fetch endpoint, bounded retry) to pre-tag-check.sh or the go-release ritual                                                    | Low    | S      | Release  |
-| 8  | Strike SU44 + SU46 rows with the evidence already gathered (excerpt byte-guard green; check-workflow-smoke.sh wired into pre-tag §7b)                       | Medium | S      | Docs     |
-| 9  | SU40: templ-components remediate-or-baseline (owner-gated since 2026-11-20)                                                                                 | Medium | M      | Quality  |
-| 10 | Pristine-help: guard live help fields against repeated-Execute double-transform (contract protected, terminal view is not)                                  | Medium | M      | Quality  |
-| 11 | SKILL.md "(since vX.Y.Z)" annotation for pristine-help once the v5.x release lands (D15: one fact, one home)                                                | Low    | S      | Docs     |
-| 12 | safe-strike: echo the row's NOTE cell in dry-run output so a verdict must address everything the row scopes (the SU4 half-done class)                       | Medium | S      | Tooling  |
-| 13 | safe-strike: refuse whole-line strikes whose matched line is already struck (the `~~~~` double-strike garbage)                                              | Medium | S      | Tooling  |
-| 14 | Wire safe-strike --purge into docs-gates CI (shell smoke test so the flag cannot silently rot)                                                              | Medium | S      | Tooling  |
-| 15 | Fleet sweep: confirm no OTHER TODO rows have landed-but-unstruck work (SU44/SU46 pattern — grep TODO rows against FEATURES/CHANGELOG evidence)              | Medium | M      | Docs     |
-| 16 | nsfw-classifier: resolve the `gomoddirectives` go.mod:161 templ-replace finding (pre-existing lint noise)                                                    | Low    | S      | Quality  |
-| 17 | Investigate the nsfw BuildFlow step failure not yet chased (which step, why)                                                                                | Medium | S      | Process  |
-| 18 | Re-verify the crm contact-notes fold explicitly (SU13's second half)                                                                                        | Low    | S      | Quality  |
+| #  | Task                                                                                                                                                       | Impact | Effort | Category |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| 1  | Bump the BuildFlow lint provider pin to `linter/v0.4.0` (fleet still lints with v0.3.0; blank import + toolsdk pin in BuildFlow's sdk_imports)             | High   | S      | Release  |
+| 2  | Cut a cmdguard v5.x release carrying the pristine-help contract fix (consumers on v5.1.0 still get ANSI in describe)                                       | High   | S      | Release  |
+| 3  | Add `attribute.ref` mapping + ref condition to the WIF provider so only refs/heads/master (and optionally tags) can impersonate the deploy SA              | Medium | S      | Security |
+| 4  | Decide `WIF_PROVIDER` secret → repo variable (the provider path is not sensitive; a variable is visible in workflow logs and less rotation-sensitive)      | Low    | S      | Decision |
+| 5  | Fleet sweep: which other repos still authenticate CI with long-lived cloud keys — apply the WIF playbook where found                                       | High   | M      | Security |
+| 6  | Verify pkg.go.dev docs for lint/v0.4.0 generated (the /fetch trigger 404'd; re-fetch until 200)                                                            | Low    | S      | Release  |
+| 7  | Add pkg.go.dev verification (fetch endpoint, bounded retry) to pre-tag-check.sh or the go-release ritual                                                   | Low    | S      | Release  |
+| 8  | Strike SU44 + SU46 rows with the evidence already gathered (excerpt byte-guard green; check-workflow-smoke.sh wired into pre-tag §7b)                      | Medium | S      | Docs     |
+| 9  | SU40: templ-components remediate-or-baseline (owner-gated since 2026-11-20)                                                                                | Medium | M      | Quality  |
+| 10 | Pristine-help: guard live help fields against repeated-Execute double-transform (contract protected, terminal view is not)                                 | Medium | M      | Quality  |
+| 11 | SKILL.md "(since vX.Y.Z)" annotation for pristine-help once the v5.x release lands (D15: one fact, one home)                                               | Low    | S      | Docs     |
+| 12 | safe-strike: echo the row's NOTE cell in dry-run output so a verdict must address everything the row scopes (the SU4 half-done class)                      | Medium | S      | Tooling  |
+| 13 | safe-strike: refuse whole-line strikes whose matched line is already struck (the `~~~~` double-strike garbage)                                             | Medium | S      | Tooling  |
+| 14 | Wire safe-strike --purge into docs-gates CI (shell smoke test so the flag cannot silently rot)                                                             | Medium | S      | Tooling  |
+| 15 | Fleet sweep: confirm no OTHER TODO rows have landed-but-unstruck work (SU44/SU46 pattern — grep TODO rows against FEATURES/CHANGELOG evidence)             | Medium | M      | Docs     |
+| 16 | nsfw-classifier: resolve the `gomoddirectives` go.mod:161 templ-replace finding (pre-existing lint noise)                                                  | Low    | S      | Quality  |
+| 17 | Investigate the nsfw BuildFlow step failure not yet chased (which step, why)                                                                               | Medium | S      | Process  |
+| 18 | Re-verify the crm contact-notes fold explicitly (SU13's second half)                                                                                       | Low    | S      | Quality  |
 | 19 | Multi-vantage SU21 check: one more measurement from a different network/geo, or Firebase releases-API timestamps, to make "not reproducible" portable      | Low    | S      | Quality  |
-| 20 | Commit the TTL/deploy-window poll script into `scripts/` (file-writing version) or retire it (currently /tmp only)                                          | Low    | S      | Tooling  |
-| 21 | Derive the deployer custom role permission-by-permission from firebase-tools' actual API calls (channels/secrets paths fail today; document the boundary)   | Low    | M      | Security |
-| 22 | AGENTS.md prose trim pass (gotchas stay, D13) — file is at 475 lines vs 220 advisory                                                                        | Low    | S      | Docs     |
-| 23 | Branch protection policy: should the Deploy Website job be a required check, and who may dispatch it? (owner call)                                          | Low    | S      | Decision |
-| 24 | annotate.go: repair TSV spec — validate target line exists/range is sane at parse time (linespec is checked per file later)                                 | Low    | M      | Tooling  |
-| 25 | WIF runbook: one doc (AGENTS gotcha section is the seed) covering pool/provider/binding/APIs/secret + the debug-probe diagnosis path for future migrations  | Medium | S      | Docs     |
+| 20 | Commit the TTL/deploy-window poll script into `scripts/` (file-writing version) or retire it (currently /tmp only)                                         | Low    | S      | Tooling  |
+| 21 | Derive the deployer custom role permission-by-permission from firebase-tools' actual API calls (channels/secrets paths fail today; document the boundary)  | Low    | M      | Security |
+| 22 | AGENTS.md prose trim pass (gotchas stay, D13) — file is at 475 lines vs 220 advisory                                                                       | Low    | S      | Docs     |
+| 23 | Branch protection policy: should the Deploy Website job be a required check, and who may dispatch it? (owner call)                                         | Low    | S      | Decision |
+| 24 | annotate.go: repair TSV spec — validate target line exists/range is sane at parse time (linespec is checked per file later)                                | Low    | M      | Tooling  |
+| 25 | WIF runbook: one doc (AGENTS gotcha section is the seed) covering pool/provider/binding/APIs/secret + the debug-probe diagnosis path for future migrations | Medium | S      | Docs     |
 
 Items 26–50 would be padding: this session surfaced nothing beyond the above.
 

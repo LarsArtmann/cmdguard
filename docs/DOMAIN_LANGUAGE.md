@@ -6,23 +6,23 @@ Inspired by Domain-Driven Design (DDD) Ubiquitous Language.
 
 ## Glossary
 
-| Term                 | Definition                                                          | Context                              |
-| -------------------- | ------------------------------------------------------------------- | ------------------------------------ |
-| CLI                  | A `CLI[T]` instance — the root application container                | Entry point for all cmdguard apps    |
-| Command              | A `Command[T,F]` — a typed subcommand with config T and flags F     | Building block for command trees     |
-| Config               | The root type parameter `T` on `CLI[T]` — typed application config  | Drives flag registration             |
-| Flags                | The per-command type parameter `F` on `Command[T,F]`                | Typed flag struct with struct tags   |
-| FlagRegistry         | Holds parsed flag tags and type/validator registries                | Copy-on-write, per-CLI instance      |
-| FlagTag              | Parsed metadata from struct tags (`flag`, `default`, `help`, etc.)  | Drives flag registration and parsing |
-| Scope                | DI container wrapping `samber/do/v2` injector                       | Manages service lifecycle            |
-| Plugin               | Bundles custom type handlers + validators for one-step registration | Applied globally or per-instance     |
-| TypeHandler          | Interface for registering, parsing, and defaulting a flag type      | Extensible via `RegisterTypeHandler` |
-| FlagValidator        | Named validation function applied to flag values                    | Registered via `RegisterValidator`   |
-| BranchingFlowContext | Tracks command execution path and branch state                      | Used by middleware and hooks         |
-| CommandInfo          | Metadata struct passed to middleware (name, path, phase, hasRunE)   | Middleware context                   |
-| SilenceUsage         | Suppresses cobra's usage-on-error footgun                           | True by default                      |
+| Term                 | Definition                                                          | Context                                                             |
+| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| CLI                  | A `CLI[T]` instance — the root application container                | Entry point for all cmdguard apps                                   |
+| Command              | A `Command[T,F]` — a typed subcommand with config T and flags F     | Building block for command trees                                    |
+| Config               | The root type parameter `T` on `CLI[T]` — typed application config  | Drives flag registration                                            |
+| Flags                | The per-command type parameter `F` on `Command[T,F]`                | Typed flag struct with struct tags                                  |
+| FlagRegistry         | Holds parsed flag tags and type/validator registries                | Copy-on-write, per-CLI instance                                     |
+| FlagTag              | Parsed metadata from struct tags (`flag`, `default`, `help`, etc.)  | Drives flag registration and parsing                                |
+| Scope                | DI container wrapping `samber/do/v2` injector                       | Manages service lifecycle                                           |
+| Plugin               | Bundles custom type handlers + validators for one-step registration | Applied globally or per-instance                                    |
+| TypeHandler          | Interface for registering, parsing, and defaulting a flag type      | Extensible via `RegisterTypeHandler`                                |
+| FlagValidator        | Named validation function applied to flag values                    | Registered via `RegisterValidator`                                  |
+| BranchingFlowContext | Tracks command execution path and branch state                      | Used by middleware and hooks                                        |
+| CommandInfo          | Metadata struct passed to middleware (name, path, phase, hasRunE)   | Middleware context                                                  |
+| SilenceUsage         | Suppresses cobra's usage-on-error footgun                           | True by default                                                     |
 | CoverageStamp        | CI-generated SVG committed to the repo on every master push         | The live coverage number; hand-maintained copies only date-stamp it |
-| ValidateRule         | One of the ten built-in validator names resolvable at parse time    | Registry source: `registerBuiltins()` in flags_validate.go |
+| ValidateRule         | One of the ten built-in validator names resolvable at parse time    | Registry source: `registerBuiltins()` in flags_validate.go          |
 
 ## Entities
 

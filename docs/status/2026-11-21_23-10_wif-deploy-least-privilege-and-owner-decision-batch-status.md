@@ -49,27 +49,27 @@ Impact: Critical/High/Medium/Low · Effort: S (<30min)/M (30min–2h)/L (>2h)
 
 <!-- check-rows:ledger -->
 
-| #  | Task                                                                                                                                                        | Impact | Effort | Category |
-| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| 1  | Bump the BuildFlow lint provider pin to `linter/v0.4.0` (fleet still lints with v0.3.0; blank import + toolsdk pin in BuildFlow's sdk_imports)              | High   | S      | Release  |
+| #  | Task                                                                                                                                                                | Impact | Effort | Category |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| 1  | Bump the BuildFlow lint provider pin to `linter/v0.4.0` (fleet still lints with v0.3.0; blank import + toolsdk pin in BuildFlow's sdk_imports)                      | High   | S      | Release  |
 | 2  | Confirm the next push-to-master deploy is green under WIF + custom role (the two green runs were dispatches; the push path is identical but deserves one green run) | Low    | S      | Verify   |
-| 3  | Cut a cmdguard v5.x release carrying the pristine-help contract fix (consumers on v5.1.0 still get ANSI in describe)                                        | High   | S      | Release  |
-| 4  | Verify pkg.go.dev docs for lint/v0.4.0 generated (the /fetch trigger 404'd; re-fetch until 200)                                                             | Low    | S      | Release  |
-| 5  | Strike SU44 + SU46 rows with the evidence already gathered (excerpt byte-guard green; check-workflow-smoke.sh wired into pre-tag §7b)                       | Medium | S      | Docs     |
-| 6  | safe-strike: echo the row's NOTE cell in dry-run output so a verdict must address everything the row scopes (the SU4 half-done class)                       | Medium | S      | Tooling  |
-| 7  | safe-strike: refuse whole-line strikes whose matched line is already struck (the `~~~~` double-strike garbage)                                              | Medium | S      | Tooling  |
-| 8  | Wire safe-strike --purge into docs-gates CI (shell smoke test so the flag cannot silently rot)                                                              | Medium | S      | Tooling  |
-| 9  | SU40: templ-components remediate-or-baseline (owner-gated since 2026-11-20)                                                                                 | Medium | M      | Quality  |
-| 10 | Pristine-help: guard live help fields against repeated-Execute double-transform (contract protected, terminal view is not)                                  | Medium | M      | Quality  |
-| 11 | SKILL.md "(since vX.Y.Z)" annotation for pristine-help once the v5.x release lands (D15: one fact, one home)                                                | Low    | S      | Docs     |
-| 12 | Fleet sweep: confirm no OTHER TODO rows have landed-but-unstruck work (SU44/SU46 pattern)                                                                   | Medium | M      | Docs     |
-| 13 | nsfw-classifier: resolve the `gomoddirectives` go.mod:161 templ-replace finding (pre-existing lint noise)                                                    | Low    | S      | Quality  |
-| 14 | Investigate the nsfw BuildFlow step failure not yet chased (which step, why)                                                                                | Medium | S      | Process  |
-| 15 | Re-verify the crm contact-notes fold explicitly (SU13's second half)                                                                                        | Low    | S      | Quality  |
-| 16 | Add pkg.go.dev verification (fetch endpoint, bounded retry) to pre-tag-check.sh or the go-release ritual                                                    | Low    | S      | Release  |
-| 17 | Decide whether `describe` should carry an explicit `help_style: "plain"` marker (additive schema field, if wanted)                                          | Low    | S      | Decision |
-| 18 | Commit the TTL/deploy-window poll script into `scripts/` or retire it (currently /tmp only)                                                                 | Low    | S      | Tooling  |
-| 19 | annotate.go: repair TSV spec — validate target line exists/range is sane at parse time (linespec is checked per file later)                                 | Low    | M      | Tooling  |
+| 3  | Cut a cmdguard v5.x release carrying the pristine-help contract fix (consumers on v5.1.0 still get ANSI in describe)                                                | High   | S      | Release  |
+| 4  | Verify pkg.go.dev docs for lint/v0.4.0 generated (the /fetch trigger 404'd; re-fetch until 200)                                                                     | Low    | S      | Release  |
+| 5  | Strike SU44 + SU46 rows with the evidence already gathered (excerpt byte-guard green; check-workflow-smoke.sh wired into pre-tag §7b)                               | Medium | S      | Docs     |
+| 6  | safe-strike: echo the row's NOTE cell in dry-run output so a verdict must address everything the row scopes (the SU4 half-done class)                               | Medium | S      | Tooling  |
+| 7  | safe-strike: refuse whole-line strikes whose matched line is already struck (the `~~~~` double-strike garbage)                                                      | Medium | S      | Tooling  |
+| 8  | Wire safe-strike --purge into docs-gates CI (shell smoke test so the flag cannot silently rot)                                                                      | Medium | S      | Tooling  |
+| 9  | SU40: templ-components remediate-or-baseline (owner-gated since 2026-11-20)                                                                                         | Medium | M      | Quality  |
+| 10 | Pristine-help: guard live help fields against repeated-Execute double-transform (contract protected, terminal view is not)                                          | Medium | M      | Quality  |
+| 11 | SKILL.md "(since vX.Y.Z)" annotation for pristine-help once the v5.x release lands (D15: one fact, one home)                                                        | Low    | S      | Docs     |
+| 12 | Fleet sweep: confirm no OTHER TODO rows have landed-but-unstruck work (SU44/SU46 pattern)                                                                           | Medium | M      | Docs     |
+| 13 | nsfw-classifier: resolve the `gomoddirectives` go.mod:161 templ-replace finding (pre-existing lint noise)                                                           | Low    | S      | Quality  |
+| 14 | Investigate the nsfw BuildFlow step failure not yet chased (which step, why)                                                                                        | Medium | S      | Process  |
+| 15 | Re-verify the crm contact-notes fold explicitly (SU13's second half)                                                                                                | Low    | S      | Quality  |
+| 16 | Add pkg.go.dev verification (fetch endpoint, bounded retry) to pre-tag-check.sh or the go-release ritual                                                            | Low    | S      | Release  |
+| 17 | Decide whether `describe` should carry an explicit `help_style: "plain"` marker (additive schema field, if wanted)                                                  | Low    | S      | Decision |
+| 18 | Commit the TTL/deploy-window poll script into `scripts/` or retire it (currently /tmp only)                                                                         | Low    | S      | Tooling  |
+| 19 | annotate.go: repair TSV spec — validate target line exists/range is sane at parse time (linespec is checked per file later)                                         | Low    | M      | Tooling  |
 
 Items 20–50 would be padding: this session surfaced nothing beyond the above.
 

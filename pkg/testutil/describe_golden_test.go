@@ -1,7 +1,7 @@
 package testutil
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"os/exec"
 	"path/filepath"
 	"testing"

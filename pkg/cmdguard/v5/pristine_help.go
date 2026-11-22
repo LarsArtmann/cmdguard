@@ -1,7 +1,7 @@
 package v5
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 
 	"github.com/spf13/cobra"
 )

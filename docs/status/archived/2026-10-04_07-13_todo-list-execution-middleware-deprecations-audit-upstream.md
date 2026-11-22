@@ -109,15 +109,15 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 ## b) PARTIALLY DONE
 
 ~~1. **F1 cmdguard side (BLOCKED, by design):** `AuditMiddleware[T]` is NOT wired.~~ done — F1 landed in v5: AuditMiddleware+WithAuditMiddleware via Plugin.RecordCommand (pkg/cmdguard/v5/auditlog.go:232,259)
-   It cannot ship until samber-do-auditlog is pushed + tagged ≥ v0.11.0 — a
-   committed call to `Plugin.RecordCommand` against go.mod's v0.10.0 would break
-   every non-local build (workspace `replace` doesn't travel). TODO_LIST carries
-   the exact unblock steps.
+It cannot ship until samber-do-auditlog is pushed + tagged ≥ v0.11.0 — a
+committed call to `Plugin.RecordCommand` against go.mod's v0.10.0 would break
+every non-local build (workspace `replace` doesn't travel). TODO_LIST carries
+the exact unblock steps.
 ~~2. **CHANGELOG.md (cmdguard):** my Unreleased entries (Added/Deprecated/Changed +~~ done — CHANGELOG re-applied: [4.0.2] backfill at CHANGELOG.md:507; [4.1.0] 2026-10-04 section at :455
-   backfilled [4.0.2]) were written, then lost to a concurrent-session overwrite,
-   then my re-apply edit failed on a mid-air "file modified" collision. The file
-   currently has NONE of my entries. Content is prepared; needs one clean re-apply
-   (2-minute task) — deliberately not retried mid-report.
+backfilled [4.0.2]) were written, then lost to a concurrent-session overwrite,
+then my re-apply edit failed on a mid-air "file modified" collision. The file
+currently has NONE of my entries. Content is prepared; needs one clean re-apply
+(2-minute task) — deliberately not retried mid-report.
 
 ---
 
@@ -135,53 +135,54 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 ## d) WHAT WENT WRONG (honest ledger)
 
 ~~1. **CHANGELOG entries clobbered twice** (see b). I verified doc numbers late —~~ done — resolved later: [4.0.2] backfill + [4.1.0] section present (CHANGELOG.md:507,455)
-   caught it only because the coverage figure wasn't where I expected. Lesson:
-   with a concurrent session active, re-verify my doc edits after daemon commits.
+caught it only because the coverage figure wasn't where I expected. Lesson:
+with a concurrent session active, re-verify my doc edits after daemon commits.
 ~~2. **Flightrecorder singleton leak broke a test under shuffled order:** my first~~ done — taskctl wires explicit WithFlightRecorderRecorder lifecycle (examples/taskctl/main.go:133)
-   taskctl approach used `WithFlightRecorder` (lazy start, never stops). BuildFlow's
-   shuffled test-race run made `TestFR_Integration_CaptureOnCommandError` fail
-   (`rec.Start()` → "already enabled"). Fixed by explicit recorder lifecycle
-   (per-test `t.Cleanup(rec.Stop)`; `run()` stops the production recorder). My
-   local runs had passed because file order ran coverage_test.go first — I
-   initially shipped a test that was order-dependent and didn't know it.
+taskctl approach used `WithFlightRecorder` (lazy start, never stops). BuildFlow's
+shuffled test-race run made `TestFR_Integration_CaptureOnCommandError` fail
+(`rec.Start()` → "already enabled"). Fixed by explicit recorder lifecycle
+(per-test `t.Cleanup(rec.Stop)`; `run()` stops the production recorder). My
+local runs had passed because file order ran coverage_test.go first — I
+initially shipped a test that was order-dependent and didn't know it.
 ~~3. **Coverage numbers churned in docs:** wrote 80.1% into three docs, refactor~~ **NOT-DO — historical incident note; numbers settled at 85.9%, now superseded by the CI badge (AGENTS.md:9).**
-   dropped real coverage to 76.9% → 78.5% → 85.9% final. Should have measured
-   once at the end; two docs carried a stale number briefly.
+dropped real coverage to 76.9% → 78.5% → 85.9% final. Should have measured
+once at the end; two docs carried a stale number briefly.
 ~~4. **`db status` in the store-failure table** — that command doesn't touch the~~ **NOT-DO — fixed in-session (db dropped from the table); no db store case in taskctl tests today.**
-   store; test failed once, fixed by dropping it. Read the handler before
-   assuming DI usage.
+store; test failed once, fixed by dropping it. Read the handler before
+assuming DI usage.
 ~~5. **Two edit-tool mid-air failures** (taskctl main.go tail, CHANGELOG §2) from~~ **NOT-DO — transient edit-tool mishap, recovered same session; no follow-up work.**
-   whitespace/context mismatch — recovered by re-reading; wasted a cycle each.
+whitespace/context mismatch — recovered by re-reading; wasted a cycle each.
 ~~6. **`rg -rn` misuse** (replace flag) mangled one grep — harmless, caught.~~ **NOT-DO — transient grep mishap, caught immediately; no follow-up work.**
 ~~7. **BuildFlow full gate is red on environment, not code:** license-check~~ done — env gaps closed: go-licenses auto-defer (2026-10-07) + sandbox GOTOOLCHAIN=local pin (AGENTS.md:324,326)
-   (go-licenses not in PATH outside `nix develop`), nix-build-verify/treefmt
-   (sandbox DNS refused → go1.27.0 toolchain download fails). Pre-existing,
-   reproduced across 6+ runs before mine. Go build/test/race/lint steps green.
+(go-licenses not in PATH outside `nix develop`), nix-build-verify/treefmt
+(sandbox DNS refused → go1.27.0 toolchain download fails). Pre-existing,
+reproduced across 6+ runs before mine. Go build/test/race/lint steps green.
 ~~8. **lint/ sub-module is mid-refactor by a concurrent session** (working-tree~~ done — lint/ shipped: lint/v0.3.0 tag + CHANGELOG section (CHANGELOG.md:303)
-   changes I didn't author + a parse error in `lint/cmd/cmdguard-lint/main.go`
-   - their own status file written 2 min ago). Workspace-wide builds that fan
-     into ./lint fail through no fault of this session's changes. Left untouched
-     per "never revert changes you didn't author".
+changes I didn't author + a parse error in `lint/cmd/cmdguard-lint/main.go`
+
+- their own status file written 2 min ago). Workspace-wide builds that fan
+  into ./lint fail through no fault of this session's changes. Left untouched
+  per "never revert changes you didn't author".
 
 ---
 
 ## e) WHAT WE SHOULD IMPROVE
 
 ~~1. TODO_LIST had 8 of 13 items stale — the harvest/verify loop runs too rarely;~~ done — harvest loop mechanized: docs-gates battery + TODO_LIST harvest sections (2026-11-08/11-11)
-   consider the docs-health drift alarm (verify-checklist reference) for this repo.
+consider the docs-health drift alarm (verify-checklist reference) for this repo.
 ~~2. AGENTS.md project structure omits the `lint/` sub-module entirely (and says~~ done — AGENTS.md:98 structure tree documents the lint/ sub-module
-   "6 modules" while go.work now has 7 incl. ./lint + local go-output replaces
-   from the concurrent session). Structure section is drifting.
+"6 modules" while go.work now has 7 incl. ./lint + local go-output replaces
+from the concurrent session). Structure section is drifting.
 ~~3. AGENTS.md exceeds the doctor's 377-line budget (386 pre-session → ~395 now~~ **Won't implement — 377-line doctor budget superseded; AGENTS.md is 456 lines after the v5 living-docs rebuild.**
-   despite my condensing). Needs a deliberate content split, not more trimming.
+despite my condensing). Needs a deliberate content split, not more trimming.
 ~~4. taskctl's `WithFlightRecorder` option (never stops the process-wide recorder)~~ done — Stop ownership documented: explicit Start/Stop pattern at flightrecorder/README.md:48-56
-   is a footgun for embedders/tests; consider documenting Stop ownership in the
-   sub-module README or providing an auto-stop variant.
+is a footgun for embedders/tests; consider documenting Stop ownership in the
+sub-module README or providing an auto-stop variant.
 ~~5. CHANGELOG discipline: releases (v4.0.2) shipping without a CHANGELOG entry —~~ **Won't implement — never added; CONTRIBUTING.md has no CHANGELOG rules and v4.0.2-era discipline is moot post-v5.**
-   the 4.0.2 backfill I wrote from git evidence shouldn't have been needed.
+the 4.0.2 backfill I wrote from git evidence shouldn't have been needed.
 ~~6. BuildFlow env gaps (go-licenses PATH, offline nix toolchain download) make the~~ done — same fixes as §d.7: go-licenses auto-defer + GOTOOLCHAIN=local sandbox pin (AGENTS.md:324,326)
-   "full" gate permanently red locally — either fix the env or scope skip_steps
-   so the gate's signal is trustworthy.
+"full" gate permanently red locally — either fix the env or scope skip_steps
+so the gate's signal is trustworthy.
 
 ---
 
@@ -208,7 +209,7 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 ~~19. Update AGENTS.md "6 modules" → current go.work truth (incl. go-output replaces).~~ done — AGENTS.md states 8 modules incl. lint (AGENTS.md:113,309); go.work confirms
 ~~20. AGENTS.md size diet to ≤377 lines (move detail to docs/).~~ **Won't implement — diet superseded by the v5 living-docs rebuild; AGENTS.md is now 456 lines.**
 ~~21. Investigate nix-build-verify 6/6 failures (offline toolchain fetch).~~ done — fixed: flake pins goPkg + GOTOOLCHAIN=local so sandboxed treefmt needs no network (AGENTS.md:324)
-    ~~22. Install go-licenses in devShell/PATH so license-check can run locally.~~ done — superseded — BuildFlow auto-defers the go-licenses stdlib class since 2026-10-07 (AGENTS.md pre-commit note)
+~~22. Install go-licenses in devShell/PATH so license-check can run locally.~~ done — superseded — BuildFlow auto-defers the go-licenses stdlib class since 2026-10-07 (AGENTS.md pre-commit note)
 ~~22. Decide skip_steps for sandbox-hostile nix checks (or make them hermetic).~~ done — made hermetic: goPkg ≥ go-directive rule + GOTOOLCHAIN=local documented (AGENTS.md:324)
 ~~23. taskctl: cover remaining buildCommands error branches via fault injection?~~ **Won't implement — v4-era ask; taskctl migrated to v5 and measures 93.9% coverage (AGENTS.md:70).**
 ~~24. taskctl: `db` parent + `env create --force` paths coverage.~~ **Won't implement — v4-era ask; taskctl migrated to v5 and measures 93.9% coverage (AGENTS.md:70).**
@@ -222,9 +223,9 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 ~~32. ExportAuditLog: consider Writer-based test instead of read-only-dir (portability).~~ **Won't implement — taskctl kept file-based export; v5 has its own ExportAuditLog tests (cli_auditlog_test.go:261).**
 ~~33. Flightrecorder: document Stop-ownership semantics in README (embedders).~~ done — flightrecorder README:48-56 documents Stop ownership with defer rec.Stop pattern
 ~~34. Flightrecorder: optional auto-stop middleware variant (owns lifecycle).~~ **NOT-DO — auto-stop variant never built; README teaches explicit lifecycle instead (flightrecorder/README.md:48-56).**
-    ~~36. Samber-do-auditlog: HTML viz "Command" color distinct from Registration (both --accent).~~ done — auditlog viz colors are centralized per-type lookup tables now (samber-do-auditlog daghtml_adapter.go status and provider maps, metadata_test.go event colors), so Command and Registration no longer share one accent in the graph layer
-    ~~37. Samber-do-auditlog: consider dedicated `command_name` field over ServiceRef overload (schema 0.4.0).~~ **→ routed — ROADMAP Harvested, cmdguard-lint `command_name` field**
-    ~~38. Samber-do-auditlog: cmdguard-lint-style rule or doc forbidding ServiceName pollution?~~ **→ ROADMAP Harvested (cmdguard-lint ServiceName-pollution rule)**
+~~36. Samber-do-auditlog: HTML viz "Command" color distinct from Registration (both --accent).~~ done — auditlog viz colors are centralized per-type lookup tables now (samber-do-auditlog daghtml_adapter.go status and provider maps, metadata_test.go event colors), so Command and Registration no longer share one accent in the graph layer
+~~37. Samber-do-auditlog: consider dedicated `command_name` field over ServiceRef overload (schema 0.4.0).~~ **→ routed — ROADMAP Harvested, cmdguard-lint `command_name` field**
+~~38. Samber-do-auditlog: cmdguard-lint-style rule or doc forbidding ServiceName pollution?~~ **→ ROADMAP Harvested (cmdguard-lint ServiceName-pollution rule)**
 ~~35. CHANGELOG entry for 4.0.2 should have existed at tag time — add release checklist item.~~ **Won't implement — checklist item never added; publish discipline moved to the lint/v0.2.1 release playbook (TODO_LIST F3).**
 ~~36. Benchmarks for ContextMiddleware overhead vs plain (benchmarks/ dir).~~ **NOT-DO — never landed; benchmarks/guard_bench_test.go covers CLI construct/execute, no middleware-overhead bench.**
 ~~37. Table-driven test consolidation in middleware_context_test.go (minor).~~ **Won't implement — v4 test file retired; v5 middleware_context_test.go (378 lines) is the current suite.**
@@ -243,15 +244,15 @@ Implemented in ../samber-do-auditlog (local, Unreleased):
 ## g) QUESTIONS FOR LARS (cannot self-answer)
 
 ~~1. **Push permission:** may I `git push` + tag `samber-do-auditlog` v0.11.0~~ done — resolved: auditlog v0.11.0+ published (tags through v0.12.3); cmdguard consumes v0.12.3 (go.mod:84)
-   (and later cmdguard), or do you want to review the upstream API first
-   (`RecordCommand` overloads `ServiceRef.ServiceName` with the command name —
-   the alternative is a schema-0.4.0 `command_name` field, item 37)?
+(and later cmdguard), or do you want to review the upstream API first
+(`RecordCommand` overloads `ServiceRef.ServiceName` with the command name —
+the alternative is a schema-0.4.0 `command_name` field, item 37)?
 ~~2. **Concurrent session on lint/:** another agent is mid-refactor of the~~ done — resolved: lint/ shipped (tags lint/v0.2.1, lint/v0.3.0; CHANGELOG.md:303)
-   `lint/` sub-module (working-tree changes + a parse error right now). Leave
-   it alone, or should I take over/finish it once you confirm it's abandoned?
+`lint/` sub-module (working-tree changes + a parse error right now). Leave
+it alone, or should I take over/finish it once you confirm it's abandoned?
 ~~3. **CHANGELOG collision:** my Unreleased entries were overwritten once by that~~ done — resolved: entries re-applied — [4.0.2] backfill present (CHANGELOG.md:507)
-   concurrent session. Re-apply immediately (risking another collision while
-   it's active), or wait for your go-ahead / its completion?
+concurrent session. Re-apply immediately (risking another collision while
+it's active), or wait for your go-ahead / its completion?
 
 ---
 
