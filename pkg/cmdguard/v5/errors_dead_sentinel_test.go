@@ -78,13 +78,17 @@ func TestNoDeadSentinels(t *testing.T) {
 			if pos, isSentinel := declPos[id.Name]; isSentinel && id.Pos() != pos {
 				alive[id.Name] = true
 			}
+
 			return true
 		})
 	}
 
 	for name := range declPos {
 		if !alive[name] {
-			t.Errorf("sentinel %s is declared but never referenced outside its declaration and the facts table; remove it or wire it into a code path", name)
+			t.Errorf(
+				"sentinel %s is declared but never referenced outside its declaration and the facts table; remove it or wire it",
+				name,
+			)
 		}
 	}
 }
@@ -92,12 +96,16 @@ func TestNoDeadSentinels(t *testing.T) {
 func isSentinelVarName(name string) bool {
 	if strings.HasPrefix(name, "Err") {
 		rest := name[len("Err"):]
+
 		return rest != "" && unicode.IsUpper(rune(rest[0]))
 	}
+
 	if strings.HasPrefix(name, "err") {
 		rest := name[len("err"):]
+
 		return rest != ""
 	}
+
 	return false
 }
 
@@ -105,6 +113,8 @@ func isSentinelInitializer(vs *ast.ValueSpec, value ast.Expr) bool {
 	if id, ok := vs.Type.(*ast.Ident); ok && id.Name == "error" {
 		return true
 	}
+
 	_, ok := value.(*ast.CallExpr)
+
 	return ok
 }

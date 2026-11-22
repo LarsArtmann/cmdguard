@@ -113,6 +113,20 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 - TODO_LIST purge (2026-11-21): | SU17 | Least-privilege the deploy SA: per-site deployer on `cmdguard` only                                                                                                          | SA is project-wide `firebasehosting.admin` over ~20 hosting sites on lars-software (20-43 report §b2)                                                  | 🔴 TODO | — done 2026-11-21 (amended mechanism: Firebase Hosting has no per-site IAM scope and no deployer role; custom projects/lars-software/roles/cmdguardHostingDeployer swapped in for firebasehosting.admin, no sites.create/sites.delete; dispatch deploy green)
 - TODO_LIST purge (2026-11-21): | SU21 | Root-cause the ~60s post-deploy 503/stale window; eliminate or document it                                                                                                   | content-identical deploy, 60s brownout, "edge propagation" assumed never verified (20-43 report §d6)                                                   | 🔴 TODO | — done 2026-11-21 (documented: not reproducible; 5s polling across two live deploys saw the new release visible within <=6s, zero 503/stale samples; deploy-meta.json max-age=3600 is a browser directive, the edge invalidates on release)
 
+### Removed
+
+- **Five dead sentinel errors** that no code path ever returned:
+  `ErrEditorTempFile`, `ErrEditorWrite`, `ErrEditorRun`, `ErrEditorRead`, and
+  `ErrNilValue` (`nil_value` machine code). v3 had already cut the editor
+  sentinels as dead weight; the v5 scaffold re-added them mechanically and
+  they sat in the public API and the generated `docs/ERROR_REFERENCE.md` while
+  being unreachable. Surfaces a strict `erraudit tree ./... --max` audit
+  flagged as unreferenced (2026-11-22). The sentinel fact table now covers 57
+  sentinels, the `editor` envelope class is gone, and a new
+  `TestNoDeadSentinels` tripwire fails when a declared sentinel is never
+  referenced outside its declaration and the facts table. No runtime behavior
+  changed: no caller could ever have matched these via `errors.Is`.
+
 ### Fixed
 
 - **Machine contract and generated docs no longer carry ANSI-styled help.**

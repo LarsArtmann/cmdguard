@@ -238,4 +238,3 @@ func NewExitError(code int, err error) (*ExitError, error) {
 
 	return &ExitError{Code: code, Err: err}, nil
 }
-
