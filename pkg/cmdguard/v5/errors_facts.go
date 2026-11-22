@@ -175,7 +175,6 @@ func sentinelFacts() []sentinelFact { //nolint:funlen,maintidx // canonical data
 			"unsupported_conversion",
 			"use a supported flag type or register a TypeCodec for this type",
 		},
-		{ErrNilValue, "ErrNilValue", "flag", "nil_value", "provide a value; nil is not accepted here"},
 		{
 			ErrConfigValidation,
 			"ErrConfigValidation",
@@ -381,10 +380,6 @@ func sentinelFacts() []sentinelFact { //nolint:funlen,maintidx // canonical data
 			"doctor_failed",
 			"run the failing checks individually to see which dependency is unhealthy",
 		},
-		{ErrEditorTempFile, "ErrEditorTempFile", "editor", "editor_temp_file", "check the temp directory is writable"},
-		{ErrEditorWrite, "ErrEditorWrite", "editor", "editor_write", "check the temp file is writable"},
-		{ErrEditorRun, "ErrEditorRun", "editor", "editor_run", "check that $EDITOR points to an executable program"},
-		{ErrEditorRead, "ErrEditorRead", "editor", "editor_read", "check the edited file is readable"},
 		{
 			ErrFlagParseFailed,
 			"ErrFlagParseFailed",

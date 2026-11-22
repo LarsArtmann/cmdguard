@@ -17,7 +17,6 @@ var referenceClassOrder = []string{ //nolint:gochecknoglobals // fixed section o
 	"audit",
 	"exit_code",
 	"doctor",
-	"editor",
 }
 
 // Reference markers bracket the generated section of docs/ERROR_REFERENCE.md.
