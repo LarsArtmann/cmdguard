@@ -173,7 +173,9 @@ erraudit posture:
     findings" inventory with dates and reasons (ratchet-style, like audit_max).
 
 Docs & truth surfaces:
-21. Harvest this report's section (f) into TODO_LIST/ROADMAP (docs-health HARVEST).
+21. ~~Harvest this report's section (f) into TODO_LIST/ROADMAP (docs-health HARVEST).~~
+    — done 2026-11-22: SA1-SA8 routed to TODO_LIST "Sentinel & erraudit follow-ups";
+    the brainstorm remainder is deliberately parked in this §f as ROADMAP fuel.
 22. Update ROADMAP.md:194 (family-specific format constructors) to reference today's
     disposition so the row carries its decision context.
 23. Schedule the website `changelog.mdx` update to ride the next release's changelog

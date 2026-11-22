@@ -1,5 +1,10 @@
 # CUE Adoption Analysis: Session Status and Self-Review
 
+> **Live remainder:** archived 2026-11-22 (cadence, 24th unarchived report).
+> All open items are struck/routed — resolutions annotated inline; the
+> bounded CUE-spike decision record superseding this analysis lives in
+> docs/adr/ and the config-file gotchas in AGENTS.md.
+
 <!-- check-rows:ledger -->
 
 | Field        | Value                                                                   |
