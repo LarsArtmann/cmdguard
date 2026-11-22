@@ -18,6 +18,7 @@ type SentinelFinding struct {
 	File string // declaring file path as discovered under dir
 	Dir  string // package directory that owns the declaration
 }
+
 // SentinelScan is the outcome of one FindDeadSentinels pass over a tree.
 type SentinelScan struct {
 	// Declarations counts sentinel-candidate vars found across the tree.
@@ -26,6 +27,13 @@ type SentinelScan struct {
 	Declarations int
 	// Findings lists declared-but-unwired sentinels.
 	Findings []SentinelFinding
+}
+
+// sentinelDecl is one sentinel-candidate var: where it was declared and at
+// which position (valid within its own file's parse).
+type sentinelDecl struct {
+	file string
+	pos  token.Pos
 }
 
 // FindDeadSentinels scans every Go package under dir (skipping _test.go
@@ -42,47 +50,49 @@ type SentinelScan struct {
 // sentinel must be wired (returned, wrapped, or classified) or deleted.
 func FindDeadSentinels(dir, allowFile string) (SentinelScan, error) {
 	scan := SentinelScan{}
-	declFileByDir := map[string]map[string]string{}
+	declsByDir := map[string]map[string]sentinelDecl{}
 
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
 		if d.IsDir() {
-			return skipSentinelTree(d, path)
+			if path != dir && skipSentinelTree(d) {
+				return filepath.SkipDir
+			}
+			return nil
 		}
 		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
 			return nil
 		}
 
 		dirPath := filepath.Dir(path)
-		fset := token.NewFileSet()
-		af, parseErr := parser.ParseFile(fset, path, nil, 0)
+		af, parseErr := parser.ParseFile(token.NewFileSet(), path, nil, 0)
 		if parseErr != nil {
 			return parseErr
 		}
 
-		if declFileByDir[dirPath] == nil {
-			declFileByDir[dirPath] = map[string]string{}
+		if declsByDir[dirPath] == nil {
+			declsByDir[dirPath] = map[string]sentinelDecl{}
 		}
-		collectSentinelDecls(af, path, declFileByDir[dirPath])
+		collectSentinelDecls(af, path, declsByDir[dirPath])
 		return nil
 	})
 	if err != nil {
 		return SentinelScan{}, err
 	}
 
-	for dirPath, declFile := range declFileByDir {
-		scan.Declarations += len(declFile)
-		alive, err := wiredSentinels(dirPath, declFile, allowFile)
+	for dirPath, decls := range declsByDir {
+		scan.Declarations += len(decls)
+		alive, err := wiredSentinels(dirPath, decls, allowFile)
 		if err != nil {
 			return SentinelScan{}, err
 		}
-		for name, file := range declFile {
+		for name, decl := range decls {
 			if !alive[name] {
 				scan.Findings = append(scan.Findings, SentinelFinding{
 					Name: name,
-					File: file,
+					File: decl.file,
 					Dir:  dirPath,
 				})
 			}
@@ -92,18 +102,17 @@ func FindDeadSentinels(dir, allowFile string) (SentinelScan, error) {
 	return scan, nil
 }
 
-// skipSentinelTree skips subtree walks that cannot own sentinel wiring.
-func skipSentinelTree(d fs.DirEntry, path string) error {
+// skipSentinelTree reports whether a subtree cannot own sentinel wiring:
+// vendored code, test fixtures, and hidden trees are all skipped. The walk
+// root itself is exempt (checked by the caller).
+func skipSentinelTree(d fs.DirEntry) bool {
 	name := d.Name()
-	if name == "vendor" || name == "testdata" || strings.HasPrefix(name, ".") {
-		return filepath.SkipDir
-	}
-	return nil
+	return name == "vendor" || name == "testdata" || strings.HasPrefix(name, ".")
 }
 
-// collectSentinelDecls records the declaring file of every
-// sentinel-candidate var declared at package level in af.
-func collectSentinelDecls(af *ast.File, file string, declFile map[string]string) {
+// collectSentinelDecls records every sentinel-candidate var declared at
+// package level in af (its declaring file and declaration position).
+func collectSentinelDecls(af *ast.File, file string, decls map[string]sentinelDecl) {
 	for _, d := range af.Decls {
 		gd, ok := d.(*ast.GenDecl)
 		if !ok || gd.Tok != token.VAR {
@@ -116,7 +125,7 @@ func collectSentinelDecls(af *ast.File, file string, declFile map[string]string)
 			}
 			for i, name := range vs.Names {
 				if isSentinelVarName(name.Name) && isSentinelInitializer(vs, vs.Values[i]) {
-					declFile[name.Name] = file
+					decls[name.Name] = sentinelDecl{file: file, pos: name.Pos()}
 				}
 			}
 		}
@@ -126,8 +135,8 @@ func collectSentinelDecls(af *ast.File, file string, declFile map[string]string)
 // wiredSentinels re-parses the package files in dirPath and marks every
 // sentinel referenced outside its declaration and the allow-listed
 // bookkeeping file as alive.
-func wiredSentinels(dirPath string, declFile map[string]string, allowFile string) (map[string]bool, error) {
-	alive := make(map[string]bool, len(declFile))
+func wiredSentinels(dirPath string, decls map[string]sentinelDecl, allowFile string) (map[string]bool, error) {
+	alive := make(map[string]bool, len(decls))
 	files, err := filepath.Glob(filepath.Join(dirPath, "*.go"))
 	if err != nil {
 		return nil, err
@@ -137,24 +146,55 @@ func wiredSentinels(dirPath string, declFile map[string]string, allowFile string
 		if strings.HasSuffix(f, "_test.go") || filepath.Base(f) == allowFile {
 			continue
 		}
-		fset := token.NewFileSet()
-		af, parseErr := parser.ParseFile(fset, f, nil, 0)
+		af, parseErr := parser.ParseFile(token.NewFileSet(), f, nil, 0)
 		if parseErr != nil {
 			return nil, parseErr
 		}
+
+		selfPos := selfDeclPositions(af, decls, f)
 		ast.Inspect(af, func(n ast.Node) bool {
 			id, ok := n.(*ast.Ident)
 			if !ok {
 				return true
 			}
-			if _, isSentinel := declFile[id.Name]; isSentinel {
-				alive[id.Name] = true
+			if _, isSentinel := decls[id.Name]; !isSentinel {
+				return true
 			}
+			if pos, isSelf := selfPos[id.Name]; isSelf && id.Pos() == pos {
+				return true
+			}
+			alive[id.Name] = true
 			return true
 		})
 	}
 
 	return alive, nil
+}
+
+// selfDeclPositions maps the sentinel names DECLARED in af (restricted to
+// the tracked set owned by file) to their declaration positions, so the
+// reference scan can exclude the declaration itself while still counting a
+// genuine same-file use.
+func selfDeclPositions(af *ast.File, decls map[string]sentinelDecl, file string) map[string]token.Pos {
+	self := map[string]token.Pos{}
+	for _, d := range af.Decls {
+		gd, ok := d.(*ast.GenDecl)
+		if !ok || gd.Tok != token.VAR {
+			continue
+		}
+		for _, spec := range gd.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+			for _, name := range vs.Names {
+				if decl, tracked := decls[name.Name]; tracked && decl.file == file {
+					self[name.Name] = name.Pos()
+				}
+			}
+		}
+	}
+	return self
 }
 
 // isSentinelVarName reports whether name follows the sentinel conventions:
