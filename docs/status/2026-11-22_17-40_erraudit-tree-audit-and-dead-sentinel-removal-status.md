@@ -134,6 +134,7 @@ that did NOT damage state:
 ## f) UP TO 50 THINGS TO GET DONE NEXT (brainstorm — most are ROADMAP fuel)
 
 Sentinel & error system:
+
 1. Owner decision: ship the 5-sentinel removal in v5.2.0 (minor + explicit
    API-surface-correction note) or hold for v6.
 2. Extend `TestNoDeadSentinels` to the `flightrecorder` module.
@@ -160,77 +161,77 @@ Sentinel & error system:
 
 erraudit posture:
 15. Decide: make erraudit a real CI gate (pinned `go run …@v1` like docs-gates) or keep
-    it audit-only.
+it audit-only.
 16. If gated: pin the exact invocation (`lint ./... --max --disable generic_return`,
-    per module) in ci.yml.
+per module) in ci.yml.
 17. If not gated: write the acceptance into an erraudit config file so findings are
-    dispositioned by tooling, not prose.
+dispositioned by tooling, not prose.
 18. Document in AGENTS.md WHY tree shows badges while lint mode shows none (runner
-    drops enforcement analyzers in lint).
+drops enforcement analyzers in lint).
 19. Track the erraudit binary version in use (`ee8a415`); bump consciously when the
-    fleet standardizes a new one.
+fleet standardizes a new one.
 20. Add `stdlib_constructor` + `generic_return` to a repo-local "known accepted
-    findings" inventory with dates and reasons (ratchet-style, like audit_max).
+findings" inventory with dates and reasons (ratchet-style, like audit_max).
 
 Docs & truth surfaces:
 21. ~~Harvest this report's section (f) into TODO_LIST/ROADMAP (docs-health HARVEST).~~
-    — done 2026-11-22: SA1-SA8 routed to TODO_LIST "Sentinel & erraudit follow-ups";
-    the brainstorm remainder is deliberately parked in this §f as ROADMAP fuel.
+— done 2026-11-22: SA1-SA8 routed to TODO_LIST "Sentinel & erraudit follow-ups";
+the brainstorm remainder is deliberately parked in this §f as ROADMAP fuel.
 22. Update ROADMAP.md:194 (family-specific format constructors) to reference today's
-    disposition so the row carries its decision context.
+disposition so the row carries its decision context.
 23. Schedule the website `changelog.mdx` update to ride the next release's changelog
-    sync (historical v5.0.0 notes deliberately untouched).
+sync (historical v5.0.0 notes deliberately untouched).
 24. Verify `website/public/llms.txt` regeneration picks up the 57-count on next build.
 25. Add the guard from e) item 5 (SKILL count vs ERROR_REFERENCE header tripwire).
 26. Re-derive the SKILL.md count again at the NEXT sentinel addition (process note in
-    the SKILL row already dates it — keep dating on every change).
+the SKILL row already dates it — keep dating on every change).
 27. Annotate this report when superseded (docs-gates battery governs; do not rewrite).
 28. Check whether FEATURES.md mentions sentinel counts anywhere (swept today: clean;
-    keep it that way via e) item 5's guard).
+keep it that way via e) item 5's guard).
 
 Release & CI:
 29. Watch the next master-push CI run: coverage badge job, dogfood docs-gates, and the
-    brandid gate should all stay green with the smaller facts table.
+brandid gate should all stay green with the smaller facts table.
 30. Verify the lint module's `rules_table_test.go` and dogfood CLI are untouched by the
-    core change (they are — confirmed by build+test — but re-check on release).
+core change (they are — confirmed by build+test — but re-check on release).
 31. Confirm pkg.go.dev renders the updated godoc after the next tag.
 32. Re-check `examples/taskctl` describe output shape on next release (contract file
-    unchanged by sentinel removal — verified via full test suite).
+unchanged by sentinel removal — verified via full test suite).
 
 Process & tooling:
 33. Pre-flight ritual: `docs-freshness --pre-flight` before ANY living-doc edit, battery
-    before commit — make it the default first step.
+before commit — make it the default first step.
 34. Replace source-append probes with temp-dir package copies everywhere.
 35. Run `nix run .#check-all` as the single closing verification next session.
 36. Run `scripts/check-skill-fanout.sh` after SKILL.md edits.
 37. Consider letting BuildFlow auto-fix gci/golines/nlreturn so 8-finding lint fallout
-    never needs manual rewriting (it auto-fixes some classes; nlreturn needed hands).
+never needs manual rewriting (it auto-fixes some classes; nlreturn needed hands).
 38. Keep the tripwire's parser failure mode fatal (current) — do not soften to skip.
 39. Note multi-name var specs (`var a, b = f()`) are skipped by the tripwire — acceptable
-    for sentinels; document in the test godoc if it ever matters.
+for sentinels; document in the test godoc if it ever matters.
 40. When a sentinel is next added: declare + wire in the SAME change (tripwire enforces),
-    and bump the SKILL derivation date in the same change (AGENTS gotcha now says both).
+and bump the SKILL derivation date in the same change (AGENTS gotcha now says both).
 
 Longer-term / ROADMAP candidates:
 41. go-error-family adoption spike (one module first, e.g. flightrecorder) — parked.
 42. Evaluate whether the 0-relationship flat hierarchy deserves a packaged "hierarchy
-    explainer" (describe-side or docs-side) for consumers auditing their own trees.
+explainer" (describe-side or docs-side) for consumers auditing their own trees.
 43. Consider a fleet-wide erraudit-inventory script (cqrs-htmx pattern:
-    `--strict` raw-count visibility, advisory-first).
+`--strict` raw-count visibility, advisory-first).
 44. Sweep other fleet repos for the same v5-scaffold dead-sentinel pattern (the
-    scaffold that re-added these five was mechanical — siblings may carry similar noise).
+scaffold that re-added these five was mechanical — siblings may carry similar noise).
 45. Add sentinel-declaration contract to the fleet linter (CG rule candidate: dead
-    sentinel detection), feeding back the tripwire idea upstream to cmdguard-lint.
+sentinel detection), feeding back the tripwire idea upstream to cmdguard-lint.
 46. Evaluate `errors.AsType` usage coverage repo-wide once the fleet Go version settles
-    past 1.26 (AGENTS already mandates it; verify no stragglers).
+past 1.26 (AGENTS already mandates it; verify no stragglers).
 47. Consider extending the JSON envelope's `error_code` stability test to the generated
-    reference (byte-stable codes already tested; cross-check doc codes vs runtime map).
+reference (byte-stable codes already tested; cross-check doc codes vs runtime map).
 48. Review `coverage_improvement_test.go` SA1012 (nil context) gopls warning —
-    pre-existing, untouched this session.
+pre-existing, untouched this session.
 49. Re-run the tree audit after the next few features land; keep the 65-count visible
-    in the next status report.
+in the next status report.
 50. Close the loop on this session's SKILL.md pattern fix: re-run the corrected `rg`
-    derivation in the next session to confirm it still matches the formatter's shape.
+derivation in the next session to confirm it still matches the formatter's shape.
 
 ## g) QUESTIONS I CANNOT FIGURE OUT MYSELF (3)
 
@@ -249,5 +250,5 @@ Longer-term / ROADMAP candidates:
 
 ---
 
-*Basis: session of 2026-11-22 ~17:00–17:40. Every claim in sections a)–d) was verified
-by a command run in that window; section f) is brainstorm, not commitment.*
+_Basis: session of 2026-11-22 ~17:00–17:40. Every claim in sections a)–d) was verified
+by a command run in that window; section f) is brainstorm, not commitment._
