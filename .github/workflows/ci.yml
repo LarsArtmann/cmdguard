@@ -47,14 +47,24 @@ jobs:
       - name: Test with race detector
         run: go test ./... -count=1 -timeout 120s -race
 
+      # Fleet-total coverage (owner decision 2026-11-21: the README badge
+      # reports ALL 8 workspace modules, not core-only). `./...` never
+      # descends into nested modules (each sub-module has its own go.mod),
+      # so create the workspace here and pattern every sub-module explicitly
+      # in the Coverage step below.
+      - name: Create go workspace
+        run: go work init . ./flightrecorder ./glamour ./lint ./prompts ./schema ./spinner ./telemetry
+
       - name: Coverage
         run: |
-          go test ./... -count=1 -timeout 120s -coverprofile=coverage.out -covermode=atomic
+          go test ./... ./flightrecorder/... ./glamour/... ./lint/... ./prompts/... ./schema/... ./spinner/... ./telemetry/... -count=1 -timeout 300s -coverprofile=coverage.out -covermode=atomic
           go tool cover -func=coverage.out
 
       # The README coverage badge is GENERATED here and committed, so the
       # number can never drift from a measured run (fleet review finding 5:
-      # no hand-maintained coverage claims). Codecov was REMOVED (2026-11-20):
+      # no hand-maintained coverage claims). It measures the FLEET-TOTAL
+      # across all 8 workspace modules (see Create go workspace above).
+      # Codecov was REMOVED (2026-11-20):
       # the repo is not activated on the Codecov side, so uploads landed on a
       # dead endpoint ("Token required - not valid tokenless upload") and its
       # badge served "unknown" — this committed SVG is the source of truth.
@@ -69,8 +79,8 @@ jobs:
           fi
           mkdir -p .github/badges
           cat > .github/badges/coverage.svg <<EOF
-          <svg xmlns="http://www.w3.org/2000/svg" width="110" height="20" role="img" aria-label="coverage: ${total}%">
-            <title>coverage: ${total}%</title>
+          <svg xmlns="http://www.w3.org/2000/svg" width="110" height="20" role="img" aria-label="coverage (all modules): ${total}%">
+            <title>coverage (all modules): ${total}%</title>
             <linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient>
             <clipPath id="r"><rect width="110" height="20" rx="3" fill="#fff"/></clipPath>
             <g clip-path="url(#r)">
