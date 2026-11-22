@@ -108,7 +108,9 @@ _Sorted roughly by impact/effort. ~28 real items, not padded to 50._
 
 1. Add invariant guard test: every submodule go.mod carries an unversioned `cmdguard/v4 => ../` replace, zero-pseudo require, and replaces for every internal sibling in its transitive graph. Mutation-verify it (re-pin one replace, test must fail).
 2. Run `buildflow` (fast mode) — full-suite collateral check after the go.mod surgery.
-3. Run `go test ./...` across modules (never ran this session).
+3. Run `go test ./...` across modules (never ran this session). — done (2026-11-22:
+   full `go test ./... -count=1 -timeout 120s -race` run green in the sentinel-removal
+   session, root + all 7 sub-modules).
 4. Run `nix build .`; if FOD hash mismatch → `buildflow -s nix-hash-fix` (never paste by hand).
 5. `buildflow doctor` — binary freshness + env, also relevant to the unexplained root-gate kill.
 6. Decide tag `v4.1.1` vs `v4.2.0` and cut it so `AddCommands` ships to proxy consumers (parallel session prepping `v4.2.0`).
