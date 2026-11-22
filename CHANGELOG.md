@@ -25,8 +25,24 @@ Dates are in YYYY-MM-DD format (ISO 8601).
 - **Fleet tooling.** `scripts/fleet-bump.sh <version>` (parameterized
   consumer-bump sweep with build+vet verification per repo) and
   `scripts/fleet-sweep.sh` (fleet evidence collection).
+- **Shared dead-sentinel tripwire.** `pkg/testutil.FindDeadSentinels` (AST
+  scan for declared-but-unwired sentinel errors; temp-dir fixtures
+  regression-test the detection logic) now backs `TestNoDeadSentinels` in
+  core and the same tripwire in `flightrecorder` and `lint`; exported
+  sentinels count as wired when referenced by qualified identifier anywhere
+  in the tree (consumer-facing API).
+- **SKILL sentinel-count tripwire.** `TestSkillSentinelCountMatchesReference`
+  fails when any sentinel count stated in the consumer SKILL.md drifts from
+  the live generated ERROR_REFERENCE count (the stored rg derivation had
+  rotted once).
 
 ### Changed
+
+- **Coverage badge is fleet-total.** CI's coverage job now creates the
+  8-module go workspace and measures every sub-module (verified 86.1%
+  locally), so the README badge's new "coverage (all modules)" alt-text and
+  title is measured truth, matching the 2026-11-21 owner decision;
+  previously the badge silently measured the root module only.
 
 - **Adoption-surface overhaul** from the 41-review fleet audit
   (`docs/reviews/2026-11-17_16-14_cmdguard-docs-marketing-ai-skills-41-reviews.html`,

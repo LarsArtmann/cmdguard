@@ -3,6 +3,7 @@ package v5
 import (
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -185,5 +186,61 @@ func TestGenerateErrorReference(t *testing.T) {
 
 	if !strings.Contains(ref, "### flag errors") {
 		t.Fatal("expected class sections in the generated reference")
+	}
+}
+
+// skillMdPath is the consumer-facing skill source (not part of the
+// published module zip, so consumer checkouts skip the count tripwire).
+const skillMdPath = "../../../.agents/skills/cmdguard/SKILL.md"
+
+// TestSkillSentinelCountMatchesReference fails when the consumer SKILL.md's
+// stated sentinel count drifts from the generated ERROR_REFERENCE count.
+// The SKILL.md count is hand-derived via an rg pattern and its stored
+// derivation rotted once already (the pattern matched nothing after a
+// formatter re-wrapped the table, caught 2026-11-22); this tripwire turns
+// that cross-file agreement into a machine check: every sentinel count
+// stated in the skill must equal the live generator's count, and at least
+// one must be present.
+func TestSkillSentinelCountMatchesReference(t *testing.T) {
+	t.Parallel()
+
+	ref := GenerateErrorReference()
+	wantCounts := regexp.MustCompile(`(\d+) sentinels`).FindAllStringSubmatch(ref, -1)
+	if len(wantCounts) == 0 {
+		t.Fatal("generated reference carries no sentinel count; the count-tripwire parse is broken")
+	}
+	want := wantCounts[0][1]
+	for _, m := range wantCounts[1:] {
+		if m[1] != want {
+			t.Fatalf("generated reference states conflicting sentinel counts: %s vs %s", want, m[1])
+		}
+	}
+
+	skill, err := os.ReadFile(skillMdPath)
+	if os.IsNotExist(err) {
+		t.Skipf("consumer checkout: %s not present outside this repo", skillMdPath)
+	}
+	if err != nil {
+		t.Fatalf("reading skill md: %v", err)
+	}
+
+	skillCounts := regexp.MustCompile(`(\d+) (?:documented sentinel|sentinels)`).FindAllStringSubmatch(string(skill), -1)
+	if len(skillCounts) == 0 {
+		t.Fatal("SKILL.md states no sentinel count; the derivation pattern in the skill has rotted — re-derive and update it")
+	}
+	seen := map[string]bool{}
+	for _, m := range skillCounts {
+		if m[1] != want {
+			t.Errorf("SKILL.md sentinel count %s does not match the generated reference count %s", m[1], want)
+		}
+		seen[m[1]] = true
+	}
+	if len(seen) > 1 {
+		keys := make([]string, 0, len(seen))
+		for k := range seen {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+		t.Errorf("SKILL.md states conflicting sentinel counts %v; unify them on %s", keys, want)
 	}
 }
