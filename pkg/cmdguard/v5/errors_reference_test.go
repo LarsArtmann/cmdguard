@@ -224,9 +224,12 @@ func TestSkillSentinelCountMatchesReference(t *testing.T) {
 		t.Fatalf("reading skill md: %v", err)
 	}
 
-	skillCounts := regexp.MustCompile(`(\d+) (?:documented sentinel|sentinels)`).FindAllStringSubmatch(string(skill), -1)
+	skillCounts := regexp.MustCompile(`(\d+) (?:documented sentinel|sentinels)`).
+		FindAllStringSubmatch(string(skill), -1)
 	if len(skillCounts) == 0 {
-		t.Fatal("SKILL.md states no sentinel count; the derivation pattern in the skill has rotted — re-derive and update it")
+		t.Fatal(
+			"SKILL.md states no sentinel count; the derivation pattern in the skill has rotted — re-derive and update it",
+		)
 	}
 	seen := map[string]bool{}
 	for _, m := range skillCounts {
