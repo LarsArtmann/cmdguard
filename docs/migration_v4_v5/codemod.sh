@@ -85,7 +85,7 @@ flag_manual() {
 
 	local found=0
 
-	for f in $(find . -type f -name '*.go' ! -path './.git/*' ! -path './vendor/*' 2>/dev/null); do
+	while IFS= read -r -d '' f; do
 		if grep -nq '\.SetConfig(' "$f"; then
 			echo "  SetConfig removed: $f"
 			grep -n '\.SetConfig(' "$f" | sed 's/^/    /'
@@ -103,7 +103,7 @@ flag_manual() {
 			grep -n "cli\.HealthCheckWithContext(" "$f" | sed "s/^/    /"
 			found=1
 		fi
-	done
+	done < <(find . -type f -name '*.go' ! -path './.git/*' ! -path './vendor/*' -print0 2>/dev/null)
 
 	if [ "$found" -eq 0 ]; then
 		echo "  none — all rewrites were mechanical"

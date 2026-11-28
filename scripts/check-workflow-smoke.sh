@@ -14,7 +14,7 @@
 #
 # Usage: scripts/check-workflow-smoke.sh   (exit 0 = smoke clean)
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 PIN_TIMEOUT_S=120
 failures=0

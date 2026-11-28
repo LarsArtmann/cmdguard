@@ -12,7 +12,7 @@ for repo in $REPOS; do
 		echo "MISSING $repo"
 		continue
 	}
-	cd "$d"
+	cd "$d" || continue
 	vet=OK
 	lint=0
 	go vet ./... >/dev/null 2>&1 || vet=FAIL
